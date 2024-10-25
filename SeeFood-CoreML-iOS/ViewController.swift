@@ -10,7 +10,7 @@ import CoreML
 import Vision
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-
+    
     @IBOutlet weak var imageView: UIImageView!
     
     let imagePicker = UIImagePickerController()
@@ -39,7 +39,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         
         imagePicker.dismiss(animated: true, completion: nil)
         
-       
+        
         
         
     }
@@ -50,11 +50,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         }
         
         let request = VNCoreMLRequest(model: model) { request, error in
-            guard let results = request.results as? [VNClassificationObservation] else {
+            guard let results = request.results as? [VNClassificationObservation],
+            let topResult = results.first
+            else {
                 fatalError("Model failed to process image.")
             }
             
-            print(results)
+            if topResult.identifier.contains("hotdog") {
+                self.navigationItem.title = "Hotdog!"
+            }
+            else {
+                self.navigationItem.title = "Not Hotdog!"
+            }
         }
         
         let handler = VNImageRequestHandler(ciImage: image)
@@ -65,7 +72,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             print(error)
         }
     }
-
+    
     @IBAction func cameraTapped(_ sender: UIBarButtonItem) {
         
         present(imagePicker, animated: true, completion: nil)
